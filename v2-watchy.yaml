@@ -189,11 +189,14 @@ display:
         )
       );
 
+      const char *haToggleIcon = id(HA_toggle).state ? mdiLightbulb : "";
+
       char leftStatusIcons[20];
-      snprintf(leftStatusIcons, 20, "%s%s%s",
+      snprintf(leftStatusIcons, 20, "%s%s%s%s",
         alertIcon,
         id(request_weather).state ? mdiCloudDownloadOutline : "",
-        wifiIcon
+        wifiIcon,
+        haToggleIcon
       );
 
       char rightStatusIcons[20];
@@ -805,11 +808,6 @@ graphical_display_menu:
               data:
                 entity_id: $DEVICE_ENTITY_ID
 
-    - text: Toggle Light Mode
-      type: switch
-      switch: toggle_light_mode
-      immediate_edit: true
-
 binary_sensor:
   # https://esphome.io/components/binary_sensor
   # https://esphome.io/components/binary_sensor/gpio
@@ -873,21 +871,7 @@ binary_sensor:
       then:
         - lambda: |-
             id(sleep_timeout) = $WAKE_TIME;
-            if (id(toggle_light_mode).state) {
-              id(light_switch).toggle();
-            } else {
-              if (id(mode) == $MODE_MENU) {
-                id(menu).enter();
-              } else if (id(mode) == $MODE_TIMERS || id(timers)[0] == 0) {
-                id(mode) = $MODE_TIMERS;
-                if (id(timers)[id(active_timer)] != 0) {
-                  id(active_timer) = (id(active_timer) + 1) % 5;
-                }
-                id(timers)[id(active_timer)] = id(ntp).utcnow().timestamp;
-              } else {
-                id(mode) = $MODE_TIMERS;
-              }
-            }
+            id(HA_toggle).toggle();
             id(epaper).update();
 
   - id: cancel_active_timer_button
@@ -1301,6 +1285,7 @@ deep_sleep:
     number: $BUTTON_LEFT_TOP_PIN
     inverted: $BUTTON_PIN_INVERTED
     allow_other_uses: true
+  sleep_duration: 10min
 
 globals:
   # https://esphome.io/components/globals.html
@@ -1596,8 +1581,8 @@ switch:
     optimistic: true
 
   - platform: template
-    id: light_switch
-    name: Light Switch
+    id: HA_toggle
+    name: HA Toggle
     optimistic: true
     turn_on_action:
       - homeassistant.service:
@@ -1609,11 +1594,6 @@ switch:
           service: switch.turn_off
           data:
             entity_id: $DEVICE_ENTITY_ID
-
-  - platform: template
-    id: toggle_light_mode
-    name: Toggle Light Mode
-    optimistic: true
 
 number:
   # https://esphome.io/components/number/template.html
