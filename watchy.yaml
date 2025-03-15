@@ -796,6 +796,15 @@ graphical_display_menu:
               data:
                 message: Hello from Watchy!
 
+    - text: Toggle Light
+      type: command
+      on_value:
+        then:
+          - homeassistant.service:
+              service: switch.toggle
+              data:
+                entity_id: switch.light_switch
+
 binary_sensor:
   # https://esphome.io/components/binary_sensor
   # https://esphome.io/components/binary_sensor/gpio
@@ -1000,6 +1009,21 @@ binary_sensor:
     ## This pin seems to be unstable and can flip randomly, causing too many epaper updates:
     # on_state:
     #   component.update: epaper
+
+  - id: light_toggle_button
+    pin:
+      number: $BUTTON_RIGHT_BOTTOM_PIN
+      allow_other_uses: true
+      inverted: $BUTTON_PIN_INVERTED
+    platform: gpio
+    on_click:
+      min_length: 0ms
+      max_length: 2s
+      then:
+        - homeassistant.service:
+            service: switch.toggle
+            data:
+              entity_id: switch.light_switch
 
 wifi:
   # https://esphome.io/components/wifi.html
@@ -1567,6 +1591,11 @@ switch:
     name: Connected
     optimistic: true
 
+  - platform: template
+    id: light_switch
+    name: Light Switch
+    optimistic: true
+
 number:
   # https://esphome.io/components/number/template.html
   - &alarmHour
@@ -1693,3 +1722,12 @@ api:
           id(agenda) = agenda_json;
           id(parse_agenda).execute();
           id(epaper).update();
+
+    - service: toggle_light
+      variables:
+        entity_id: string
+      then:
+        - homeassistant.service:
+            service: switch.toggle
+            data:
+              entity_id: !lambda 'return entity_id;'
