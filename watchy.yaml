@@ -1615,9 +1615,10 @@ switch:
           data:
             entity_id: $DEVICE_ENTITY_ID
 
-input_boolean:
-  - id: toggle_light_mode
+  - platform: template
+    id: toggle_light_mode
     name: Toggle Light Mode
+    optimistic: true
 
 number:
   # https://esphome.io/components/number/template.html
