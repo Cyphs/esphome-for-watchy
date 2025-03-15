@@ -803,7 +803,12 @@ graphical_display_menu:
           - homeassistant.service:
               service: switch.toggle
               data:
-                entity_id: switch.light_switch
+                entity_id: $DEVICE_ENTITY_ID
+
+    - text: Toggle Light Mode
+      type: switch
+      switch: toggle_light_mode
+      immediate_edit: true
 
 binary_sensor:
   # https://esphome.io/components/binary_sensor
@@ -868,16 +873,20 @@ binary_sensor:
       then:
         - lambda: |-
             id(sleep_timeout) = $WAKE_TIME;
-            if (id(mode) == $MODE_MENU) {
-              id(menu).enter();
-            } else if (id(mode) == $MODE_TIMERS || id(timers)[0] == 0) {
-              id(mode) = $MODE_TIMERS;
-              if (id(timers)[id(active_timer)] != 0) {
-                id(active_timer) = (id(active_timer) + 1) % 5;
-              }
-              id(timers)[id(active_timer)] = id(ntp).utcnow().timestamp;
+            if (id(toggle_light_mode).state) {
+              id(light_switch).toggle();
             } else {
-              id(mode) = $MODE_TIMERS;
+              if (id(mode) == $MODE_MENU) {
+                id(menu).enter();
+              } else if (id(mode) == $MODE_TIMERS || id(timers)[0] == 0) {
+                id(mode) = $MODE_TIMERS;
+                if (id(timers)[id(active_timer)] != 0) {
+                  id(active_timer) = (id(active_timer) + 1) % 5;
+                }
+                id(timers)[id(active_timer)] = id(ntp).utcnow().timestamp;
+              } else {
+                id(mode) = $MODE_TIMERS;
+              }
             }
             id(epaper).update();
 
@@ -1595,6 +1604,20 @@ switch:
     id: light_switch
     name: Light Switch
     optimistic: true
+    turn_on_action:
+      - homeassistant.service:
+          service: switch.turn_on
+          data:
+            entity_id: $DEVICE_ENTITY_ID
+    turn_off_action:
+      - homeassistant.service:
+          service: switch.turn_off
+          data:
+            entity_id: $DEVICE_ENTITY_ID
+
+input_boolean:
+  - id: toggle_light_mode
+    name: Toggle Light Mode
 
 number:
   # https://esphome.io/components/number/template.html
