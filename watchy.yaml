@@ -189,11 +189,14 @@ display:
         )
       );
 
+      const char *haToggleIcon = id(HA_toggle).state ? mdiLightbulbOn : mdiLightbulbOutline;
+
       char leftStatusIcons[20];
-      snprintf(leftStatusIcons, 20, "%s%s%s",
+      snprintf(leftStatusIcons, 20, "%s%s%s%s",
         alertIcon,
         id(request_weather).state ? mdiCloudDownloadOutline : "",
-        wifiIcon
+        wifiIcon,
+        haToggleIcon
       );
 
       char rightStatusIcons[20];

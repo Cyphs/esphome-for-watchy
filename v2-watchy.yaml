@@ -189,7 +189,7 @@ display:
         )
       );
 
-      const char *haToggleIcon = id(HA_toggle).state ? mdiLightbulb : "";
+      const char *haToggleIcon = id(HA_toggle).state ? mdiLightbulbOn : mdiLightbulbOutline;
 
       char leftStatusIcons[20];
       snprintf(leftStatusIcons, 20, "%s%s%s%s",
@@ -798,15 +798,6 @@ graphical_display_menu:
               service: notify.notify # Change this as you need, eg. any automation or scene
               data:
                 message: Hello from Watchy!
-
-    - text: Toggle Light
-      type: command
-      on_value:
-        then:
-          - homeassistant.service:
-              service: switch.toggle
-              data:
-                entity_id: $DEVICE_ENTITY_ID
 
 binary_sensor:
   # https://esphome.io/components/binary_sensor
@@ -1417,6 +1408,8 @@ font:
       - "$mdiWifi"
       - "$mdiWifiAlert"
       - "$mdiWifiOff"
+      - "$mdiLightbulbOn"
+      - "$mdiLightbulbOutline"
 
   - &mdi_weather
     id: mdi_weather
@@ -1584,16 +1577,6 @@ switch:
     id: HA_toggle
     name: HA Toggle
     optimistic: true
-    turn_on_action:
-      - homeassistant.service:
-          service: switch.turn_on
-          data:
-            entity_id: $DEVICE_ENTITY_ID
-    turn_off_action:
-      - homeassistant.service:
-          service: switch.turn_off
-          data:
-            entity_id: $DEVICE_ENTITY_ID
 
 number:
   # https://esphome.io/components/number/template.html
