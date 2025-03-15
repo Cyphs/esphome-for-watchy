@@ -1417,6 +1417,8 @@ font:
       - "$mdiWifi"
       - "$mdiWifiAlert"
       - "$mdiWifiOff"
+      - "$mdiLightbulbOn"
+      - "$mdiLightbulbOutline"
 
   - &mdi_weather
     id: mdi_weather
