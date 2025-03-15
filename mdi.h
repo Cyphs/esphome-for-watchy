@@ -99,5 +99,5 @@ const char *mdiWebBox = "\U000F0F94";
 const char *mdiWifi = "\U000F05A9";
 const char *mdiWifiAlert = "\U000F16B5";
 const char *mdiWifiOff = "\U000F05AA";
-const char *mdiLightbulbOn = "\U000F3354";
-const char *mdiLightbulbOutline = "\U000F3355";
+const char *mdiLightbulbOn = "\U000F06E8";
+const char *mdiLightbulbOutline = "\U000F0336";
