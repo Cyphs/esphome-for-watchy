@@ -65,7 +65,6 @@ esphome:
                 id(wi_fi).enable();
               }
             }
-            id(buzzer).turn_on();
           }
 
           if (now.hour == 0 && now.minute == 0) {
@@ -100,7 +99,6 @@ esphome:
           }
 
           id(epaper).update();
-          id(buzzer).turn_off();
           id(conditional_sleep).execute();
           id(alarm_buzzer).execute();
       - if:
@@ -862,7 +860,6 @@ binary_sensor:
   - id: timer_button
     pin:
       number: $BUTTON_LEFT_BOTTOM_PIN
-      allow_other_uses: true
       inverted: $BUTTON_PIN_INVERTED
     platform: gpio
     on_click:
@@ -871,52 +868,12 @@ binary_sensor:
       then:
         - lambda: |-
             id(sleep_timeout) = $WAKE_TIME;
-            id(HA_toggle).toggle();
-            id(epaper).update();
-
-  - id: cancel_active_timer_button
-    pin:
-      number: $BUTTON_LEFT_BOTTOM_PIN
-      allow_other_uses: true
-      inverted: $BUTTON_PIN_INVERTED
-    platform: gpio
-    filters:
-      delayed_on: 3s
-    on_press:
-      - lambda: |-
-          id(sleep_timeout) = $WAKE_TIME;
-          if (id(mode) == $MODE_TIMERS) {
-            id(mode) = $MODE_TIMERS;
-            id(timers)[id(active_timer)] = 0;
-            if (id(active_timer) != 0) {
-              id(active_timer) -= 1;
+            if (id(mode) == $MODE_MENU) {
+              id(menu).enter();
+            } else {
+              id(HA_toggle).toggle();
             }
             id(epaper).update();
-          } else if (id(mode) == $MODE_MENU) {
-            id(menu).show_main();
-          }
-
-  - id: clear_all_timers_button
-    pin:
-      number: $BUTTON_LEFT_BOTTOM_PIN
-      allow_other_uses: true
-      inverted: $BUTTON_PIN_INVERTED
-    platform: gpio
-    filters:
-      delayed_on: 4s
-    on_press:
-      - lambda: |-
-          id(sleep_timeout) = $WAKE_TIME;
-          if (id(mode) == $MODE_TIMERS) {
-            id(mode) = $MODE_TIMERS;
-            id(active_timer) = 0;
-            id(timers)[0] = 0;
-            id(timers)[1] = 0;
-            id(timers)[2] = 0;
-            id(timers)[3] = 0;
-            id(timers)[4] = 0;
-            id(epaper).update();
-          }
 
   ## Upper Right ##
 
@@ -1023,7 +980,7 @@ wifi:
   # https://esphome.io/components/wifi.html#connecting-to-multiple-networks
   id: wi_fi
   power_save_mode: HIGH
-  enable_on_boot: false
+  enable_on_boot: true
   ssid: $WIFI_SSID
   password: $WIFI_PASSWORD
   fast_connect: true
